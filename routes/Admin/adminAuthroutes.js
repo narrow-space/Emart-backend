@@ -5,7 +5,9 @@ const adminUpload= require("../../multerconfig/admin/adminStorageConfig");
 const adminAuthentication = require("../../middleware/admin/adminAuthenticate");
 //admin auth routes
 
-router.post("/register",adminUpload.single("admin Profile"),adminAuthControler.Register);
+router.post("/register",adminUpload.single("file"),adminAuthControler.Register);
+
+
 router.post("/login",adminAuthControler.Login);
 
 

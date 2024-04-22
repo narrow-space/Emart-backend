@@ -5,12 +5,12 @@ const fs =require("fs")
 ///register controller
 
 exports.Register = async (req, res) => {
-  const { profile, name, email, password, confirmPassword, mobile } = req.body;
-
+  const { firstname, lastname, email, password, confirmPassword, mobile } = req.body;
+ 
   if (
-    !name ||
+    !firstname ||
+    !lastname||
     !email ||
-    !mobile ||
     !password ||
     !confirmPassword ||
     !req.file
@@ -41,7 +41,8 @@ exports.Register = async (req, res) => {
         .json({ error: "password and confirmpassword not matched" });
     } else {
       const adminData = new adminDb({
-        name,
+        firstname,
+        lastname,
         email,
         mobile,
         password,

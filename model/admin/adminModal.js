@@ -6,7 +6,11 @@ const Secret_Key = "ffffasfijijdii";
 
 
 const adminSchema = new mongoose.Schema({
-  name: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
     type: String,
     required: true,
   },
@@ -25,13 +29,13 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  mobile: {
-    type: String,
-    required: true,
-    unique: true,
-    minlength: 10,
-    maxlength: 11,
-  },
+  // mobile: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  //   minlength: 10,
+  //   maxlength: 11,
+  // },
   password: {
     type: String,
     required: true,
