@@ -56,6 +56,9 @@ router.get("/getaproduct/:productid", productControler.GetSingleProduct)
 router.delete("/deleteproducts/:productid", adminAuthentication, productControler.Deleteproducts)
 
 
+// Similar Products Routes
+router.get("/product/:productid/similar", productControler.findSimilarProducts);
+
 ///Newarival PRoduct
 router.get("/newarival", productControler.NewArival)
 ///REview and Ratings a product

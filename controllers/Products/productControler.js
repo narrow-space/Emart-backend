@@ -183,6 +183,37 @@ exports.Addproducts = async (req, res) => {
   }
 };
 
+ 
+exports.findSimilarProducts = async (req, res) => {
+  const { productid } = req.params;
+
+  try {
+    // Find the product by its ID
+    const product = await productDb.findById(productid);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Define criteria for finding similar products
+    const criteria = {
+      categoryid: product.categoryid, // Similar category
+      _id: { $ne: productid } // Exclude the current product ID
+     
+    };
+
+    // Query the database for similar products
+    const similarProducts = await productDb.find(criteria)// Limit the number of results to 5
+ console.log(similarProducts)
+    res.status(200).json(similarProducts);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+
+
+
 
 
  ///Delete Products controler
