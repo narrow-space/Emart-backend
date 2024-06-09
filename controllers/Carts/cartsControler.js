@@ -5,52 +5,66 @@ const productDb = require("../../model/product/productModel")
 
 exports.AddtoCart = async (req, res) => {
     const { id } = req.params;
+    const { quantity, size } = req.body; // Destructure quantity and size from request body
 
     try {
         const getproduct = await productDb.findOne({ _id: id });
         const cartItem = await cartDb.findOne({ userid: req.userId, productid: id });
-
+        
         if (!getproduct) {
             return res.status(404).json({ error: "Product not found" });
         }
 
-        if (getproduct.quantity < 1) {
-            return res.status(400).json({ error: "This product is out of stock" });
+        if (getproduct.quantity < quantity) {
+            return res.status(400).json({ error: "Insufficient stock for the requested quantity" });
         }
 
         if (cartItem) {
-            if (cartItem.quantity < 5) {
+            if (cartItem.quantity + quantity <= 5) {
                 // Increment quantity of existing cart item
-                cartItem.quantity += 1;
+                cartItem.quantity += quantity;
+
+              
+              
+                const newSizes = Array.isArray(size) ? size : [size];
+                cartItem.sizes = [...cartItem.sizes, ...newSizes];
+
+
                 await cartItem.save();
+
                 // Decrement Product Quantity
-                getproduct.quantity -= 1;
+                getproduct.quantity -= quantity;
                 await getproduct.save();
+
                 return res.status(200).json({ message: "Product quantity increased successfully" });
             } else {
                 return res.status(400).json({ error: "You cannot add more than 5 units of this product to your cart" });
             }
         } else {
-            if (getproduct.quantity >= 1) {
+            if (getproduct.quantity >= quantity) {
                 // Create new cart item
                 const addtoCart = new cartDb({
                     userid: req.userId,
                     productid: id,
-                    quantity: 1
+                    quantity: quantity,
+                    sizes: size // Ensure size is an array
                 });
                 await addtoCart.save();
+
                 // Decrement Product Quantity
-                getproduct.quantity -= 1;
+                getproduct.quantity -= quantity;
                 await getproduct.save();
+
                 return res.status(200).json({ message: "Product added to cart successfully" });
             } else {
-                return res.status(400).json({ error: "This product is out of stock" });
+                return res.status(400).json({ error: "Insufficient stock for the requested quantity" });
             }
         }
     } catch (error) {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
 
 
 

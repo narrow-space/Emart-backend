@@ -20,6 +20,10 @@ app.use("/product/api", productsRoutes)
 const CartRoutes = require("./routes/Carts/CartsRoute.js");
 app.use("/carts/api", CartRoutes)
 
+///wishlist Routes////
+const wishListRoutes = require("./routes/wishList/wishListRoutes");
+app.use("/wishlist/api", wishListRoutes)
+
 ////Users Routes
 const userRoutes = require("./routes/user/userRoutes.js")
 app.use("/userauth/api", userRoutes)

@@ -203,7 +203,7 @@ exports.findSimilarProducts = async (req, res) => {
 
     // Query the database for similar products
     const similarProducts = await productDb.find(criteria)// Limit the number of results to 5
- console.log(similarProducts)
+ 
     res.status(200).json(similarProducts);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
