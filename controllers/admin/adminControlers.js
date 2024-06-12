@@ -5,7 +5,7 @@ const fs =require("fs")
 ///register controller
 
 exports.Register = async (req, res) => {
-  const { firstname, lastname, email, password, confirmPassword, mobile } = req.body;
+  const { firstname, lastname, email, password, confirmPassword } = req.body;
  
   if (
     !firstname ||
@@ -24,7 +24,7 @@ exports.Register = async (req, res) => {
 
   try {
     const exsitUser = await adminDb.findOne({ email: email });
-    const mobileAuth = await adminDb.findOne({ mobile: mobile });
+    
     
     if (exsitUser) {
       const filename = req.file.filename;
@@ -33,8 +33,7 @@ exports.Register = async (req, res) => {
           res.end(err)
         });
       res.status(400).json({ error: "Admin Already Exist" });
-    } else if (mobileAuth) {
-      res.status(400).json({ error: "This Number Already Exist" });
+    
     } else if (password !== confirmPassword) {
       res
         .status(400)
@@ -44,7 +43,7 @@ exports.Register = async (req, res) => {
         firstname,
         lastname,
         email,
-        mobile,
+       
         password,
         profile: upload.secure_url,
       });
