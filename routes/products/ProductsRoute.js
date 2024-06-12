@@ -50,6 +50,8 @@ router.get("/getproduct", productControler.Getproduct);
 // 2:(_Get_Search_Products)
 router.get("/search", productControler.SearchProducts);
 
+router.get('/reset-products', productControler.resetProductsByCategory);
+
 ///Get a SIngel Product
 router.get("/getaproduct/:productid", productControler.GetSingleProduct)
 /// Delete a Product

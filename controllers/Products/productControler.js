@@ -300,12 +300,7 @@ exports.Getproduct = async (req, res) => {
   }
 
   
-  //Filter by brand//
-  if (req.query.brand) {
-    productquery = productquery.find({
-      brand: { $regex: req.query.brand, $options: "i" },
-    });
-  }
+  
   //Filter by color//
   if (req.query.color) {
     productquery = productquery.find({
@@ -315,6 +310,7 @@ exports.Getproduct = async (req, res) => {
 
   //Filter by brand//
   if (req.query.brand) {
+    console.log("currentbrand",req.query.brand)
     productquery = productquery.find({
       brand: { $regex: req.query.brand, $options: "i" },
     });
@@ -322,6 +318,7 @@ exports.Getproduct = async (req, res) => {
 
   //Filter by sizes//
   if (req.query.sizes) {
+    console.log("currentsizes",req.query.sizes)
     productquery = productquery.find({
       sizes: { $regex: req.query.sizes, $options: "i" },
     });
@@ -329,6 +326,7 @@ exports.Getproduct = async (req, res) => {
   //Filter by price range//
   if (req.query.price) {
     const priceRange = req.query.price.split('-')
+    // console.log("currentpricerange:",priceRange)
 
     productquery = productquery.find({
       price: { $gte: priceRange[0], $lte: priceRange[1] }
@@ -387,6 +385,57 @@ exports.Getproduct = async (req, res) => {
   });
 
 };
+
+
+
+///reset product filter///
+exports.resetProductsByCategory = async (req, res) => {
+  try {
+    const categoryId = req.query.categoryId;
+
+    
+    if (!categoryId) {
+      return res.status(400).json({ status: 'error', message: 'Category ID is required' });
+    }
+
+    let productquery = productDb.find({ categoryId });
+
+    // Products pagination
+    const page = 1; 
+    const limit = 20; 
+
+    // Start index
+    const skip = (page - 1) * limit;
+
+    // Total products
+    const count = await productDb.countDocuments({ categoryId });
+    const pageCount = Math.ceil(count / limit);
+
+    productquery = productquery.skip(skip).limit(limit);
+
+    // Await the query
+    const products = await productquery;
+    res.json({
+      status: 'success',
+      results: products.length,
+      count,
+      Pagination: {
+        totalProducts: count,
+        pageCount,
+      },
+      message: 'Products fetched successfully with default settings',
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};
+
+
+
 
 ///Update Products///
 
