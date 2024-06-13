@@ -38,7 +38,7 @@ exports.AddtoCart = async (req, res) => {
 
                 return res.status(200).json({ message: "Product quantity increased successfully" });
             } else {
-                return res.status(400).json({ error: "You cannot add more than 5 units of this product to your cart" });
+                return res.status(400).json({ error: `can't added more than 5 products` });
             }
         } else {
             if (getproduct.quantity >= quantity) {
@@ -108,38 +108,40 @@ exports.Getcart = async (req, res) => {
 
 ////REmove Items From CaRts
 exports.RemoveSingleItemFromCart = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
+
     try {
-        const getproduct = await productDb.findOne({ _id: id })
-        const checkCart = await cartDb.findOne({ userid: req.userId, productid: getproduct._id })
+        const getproduct = await productDb.findOne({ _id: id });
+        if (!getproduct) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        const checkCart = await cartDb.findOne({ userid: req.userId, productid: getproduct._id });
         if (!checkCart) {
-            res.status(400).json({ error: "cart items not forund" })
-
-
+            return res.status(400).json({ error: "Cart item not found" });
         }
+
         if (checkCart.quantity == 1) {
-
-            const deletecartitem = await cartDb.findByIdAndDelete({ _id: checkCart._id })
-            ///Increment Product Quantity
-            getproduct.quantity = getproduct.quantity + 1
-            await getproduct.save()
-            res.status(200).json({ message: "Item Sucessfully Remove From Cart", deletecartitem })
-
-
+            // Delete the cart item
+            await cartDb.findByIdAndDelete({ _id: checkCart._id });
+            // Increment product quantity
+            getproduct.quantity += 1;
+            await getproduct.save();
+            return res.status(200).json({ message: "Item successfully removed from cart" });
+        } else if (checkCart.quantity > 1) {
+            // Decrement cart item quantity
+            checkCart.quantity -= 1;
+            await checkCart.save();
+            // Increment product quantity
+            getproduct.quantity += 1;
+            await getproduct.save();
+            return res.status(200).json({ message: "Item quantity successfully decremented" });
         }
-        else if (checkCart.quantity > 1) {
-            checkCart.quantity = checkCart.quantity - 1
-            await checkCart.save()
-            ///Increment Product Quantity
-            getproduct.quantity = getproduct.quantity + 1
-            await getproduct.save()
-            res.status(200).json({ message: "Item Sucessfully Decrement" })
-        }
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
     }
-    catch (error) {
-        res.status(400).json(error)
-    }
-}
+};
+
 ////Remove all Items form cart///
 exports.Removeallitems = async (req, res) => {
     const { id } = req.params
